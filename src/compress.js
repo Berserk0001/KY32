@@ -1,7 +1,7 @@
 "use strict";
 /*
  * compress.js
- * A module that compress a image.
+ * A module that compresses an image.
  * compress(httpRequest, httpResponse, ReadableStream);
  */
 const sharp = require('sharp')
@@ -9,19 +9,9 @@ const redirect = require('./redirect')
 
 const sharpStream = _ => sharp({ animated: !process.env.NO_ANIMATE, unlimited: true });
 
-async function compress(req, res, input) {
-  
-   let format = req.params.webp ? 'webp' : 'jpeg';
-  const imageProcessing = sharp(input.body)
+function compress(req, res, input) {
+  let format = req.params.webp ? 'webp' : 'jpeg';
 
-  const metadata = await imageProcessing.metadata();
-
-  if (format == 'webp'){
-    // maximum webp size was 16383 x 16383. using jpeg if more than 16383
-    if (metadata.height > 16383 || metadata.width > 16383 ){
-      format = 'jpeg'
-    }
-  }
   /*
    * Determine the uncompressed image size when there's no content-length header.
    */
@@ -34,14 +24,27 @@ async function compress(req, res, input) {
    * |x-original-size|Original photo size                |OriginSize                  |
    * |x-bytes-saved  |Saved bandwidth from original photo|OriginSize - Compressed Size|
    */
-  input.body.pipe(sharpStream()
+  
+  const compressor = sharpStream()
     .grayscale(req.params.grayscale)
     .toFormat(format, {
       quality: req.params.quality,
       progressive: true,
       optimizeScans: true
-    })
-    .toBuffer((err, output, info) => _sendResponse(err, output, info, format, req, res)))
+    });
+
+  compressor.metadata().then(metadata => {
+    if (format === 'webp' && (metadata.height > 16383 || metadata.width > 16383)) {
+      format = 'jpeg';
+      compressor.toFormat(format);
+    }
+
+    input.body.pipe(compressor.toBuffer((err, output, info) => 
+      _sendResponse(err, output, info, format, req, res)
+    ));
+  }).catch(err => {
+    redirect(req, res);
+  });
 }
 
 function _sendResponse(err, output, info, format, req, res) {
