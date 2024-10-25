@@ -26,7 +26,7 @@ function compress(req, res, input) {
    */
   input.body.pipe(sharpStream()
     .grayscale(req.params.grayscale)
-    .toFormat(format, {
+    .toFormat('jpeg', {
       quality: req.params.quality,
       progressive: true,
       optimizeScans: true
