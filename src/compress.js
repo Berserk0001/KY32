@@ -39,14 +39,15 @@ function _checkResponse(err, req, res, input){
       let format='jpeg'
       input.body.pipe(sharpStream()
     .grayscale(req.params.grayscale)
-    .toFormat(format, {
+    .toFormat('jpeg', {
       quality: req.params.quality,
       progressive: true,
       optimizeScans: true
     })
     .toBuffer((err, output, info) => _sendResponse(err, output, info, format, req, res)));
     }
-  else next()
+  else 
+  _sendResponse(err, output, info, format, req, res);
 }
 function _sendResponse(err, output, info, format, req, res) {
   if (err || !info ) 
