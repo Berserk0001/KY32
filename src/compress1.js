@@ -20,7 +20,7 @@ async function compress(req, res, input) {
         // Pipe the input stream into the Sharp instance and convert it to a buffer
         const { data, info } = await input.body
             .pipe(sharpInstance)
-            .toBuffer({ resolveWithObject: true });
+            .toBuffer();
 
         res.setHeader('content-type', 'image/' + format);
        res.setHeader('content-length', info.size);
