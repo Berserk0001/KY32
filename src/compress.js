@@ -10,16 +10,9 @@ const redirect = require('./redirect')
 const sharpStream = _ => sharp({ animated: !process.env.NO_ANIMATE, unlimited: true });
 
 function compress(req, res, input) {
-  sharp(input)
-  .metadata()
-  .then(meta => {
-    if (meta.width > 16384 || meta.height > 16384) {
-      const format = 'jpeg';
-    } else {
+  
   const format = req.params.webp ? 'webp' : 'jpeg';
-    }
-  });
-
+    return input.height().end();
   /*
    * Determine the uncompressed image size when there's no content-length header.
    */
