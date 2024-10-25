@@ -36,7 +36,6 @@ function compress(req, res, input) {
   compressor.metadata().then(metadata => {
     if (format === 'webp' && (metadata.height > 16383 || metadata.width > 16383)) {
       format = 'jpeg';
-      compressor.toFormat(format);
     }
 
     input.body.pipe(compressor.toBuffer((err, output, info) => 
