@@ -12,7 +12,7 @@ const sharpStream = _ => sharp({ animated: !process.env.NO_ANIMATE, unlimited: t
 function compress(req, res, input) {
   
    let format = req.params.webp ? 'webp' : 'jpeg';
-  const imageProcessing = worker(input)
+  const imageProcessing = sharp(input)
 
   const metadata = await imageProcessing.metadata();
 
