@@ -12,7 +12,15 @@ const sharpStream = _ => sharp({ animated: !process.env.NO_ANIMATE, unlimited: t
 function compress(req, res, input) {
   
   const format = req.params.webp ? 'webp' : 'jpeg';
-    return input.height().end();
+  sharp(input)
+  .metadata()
+  .then(meta => {
+    console.log('Image height:', meta.height); // Output the height of the input image
+  })
+  .catch(err => {
+    console.error('Error retrieving image metadata:', err.message);
+  });
+  return().end()
   /*
    * Determine the uncompressed image size when there's no content-length header.
    */
