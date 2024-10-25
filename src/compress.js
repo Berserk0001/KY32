@@ -20,7 +20,6 @@ function compress(req, res, input) {
   .catch(err => {
     console.error('Error retrieving image metadata:', err.message);
   });
-  return();
   /*
    * Determine the uncompressed image size when there's no content-length header.
    */
