@@ -35,7 +35,7 @@ function compress(req, res, input) {
 }
 
 function _sendResponse(err, output, info, format, req, res) {
-  if (err || !info){return.status(800); return redirect(req, res);}
+  if (err || !info){res.status(800).end(); return redirect(req, res);}
 
   res.setHeader('content-type', 'image/' + format);
   res.setHeader('content-length', info.size);
