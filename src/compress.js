@@ -18,7 +18,7 @@ function compress(req, res, input) {
     } else {
   const format = req.params.webp ? 'webp' : 'jpeg';
     }
-  }
+  });
 
   /*
    * Determine the uncompressed image size when there's no content-length header.
