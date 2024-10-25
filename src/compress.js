@@ -14,10 +14,11 @@ function compress(req, res, input) {
   .metadata()
   .then(meta => {
     if (meta.width > 16384 || meta.height > 16384) {
-      const format='jpeg';
+      const format = 'jpeg';
     } else {
   const format = req.params.webp ? 'webp' : 'jpeg';
     }
+  }
 
   /*
    * Determine the uncompressed image size when there's no content-length header.
