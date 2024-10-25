@@ -47,7 +47,7 @@ function _sendResponse(err, output, info, format, req, res) {
     .toBuffer((err, output, info) => _sendResponse(err, output, info, format, req, res)));
     }
     else
-    return redirect(req, res);
+    return redirect(req, res);}
 
   res.setHeader('content-type', 'image/' + format);
   res.setHeader('content-length', info.size);
