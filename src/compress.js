@@ -39,7 +39,7 @@ function _sendResponse(err, output, info, format, req, res) {
     if (err && err.message === 'Processed image is too large for the WebP format') {
       input.body.pipe(sharpStream()
     .grayscale(req.params.grayscale)
-    .toFormat(format, {
+    .toFormat('jpeg', {
       quality: req.params.quality,
       progressive: true,
       optimizeScans: true
