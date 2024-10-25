@@ -35,7 +35,7 @@ function compress(req, res, input) {
 }
 
 function _sendResponse(err, output, info, format, req, res) {
-  if (err || !info){console.err('Compression error:', err); return redirect(req, res);}
+  if (err || !info){ console.log('Compression error:', err); return redirect(req, res);}
 
   res.setHeader('content-type', 'image/' + format);
   res.setHeader('content-length', info.size);
