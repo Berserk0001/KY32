@@ -28,10 +28,7 @@ function compress(req, res, input) {
         optimizeScans: true
       })
       .toBuffer((err, output, info) => _sendResponse(err, output, info, format, req, res)));
-  }).catch(err => {
-    console.error('Error processing image metadata:', err);
-    redirect(req, res);
-  });
+  })
 }
 
 function _sendResponse(err, output, info, format, req, res) {
