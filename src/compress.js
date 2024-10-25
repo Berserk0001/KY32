@@ -36,15 +36,17 @@ const format= req.params.webp ? 'webp' : 'jpeg';
 
 function _checkResponse(err, req, res, input){
   if (err && err.message === 'Processed image is too large for the WebP format'){
+      let format='jpeg'
       input.body.pipe(sharpStream()
     .grayscale(req.params.grayscale)
-    .toFormat('jpeg', {
+    .toFormat(format, {
       quality: req.params.quality,
       progressive: true,
       optimizeScans: true
     })
     .toBuffer((err, output, info) => _sendResponse(err, output, info, format, req, res)));
     }
+  else next()
 }
 function _sendResponse(err, output, info, format, req, res) {
   if (err || !info ) 
