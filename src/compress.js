@@ -6,7 +6,6 @@
  */
 const sharp = require('sharp');
 const redirect = require('./redirect');
-const params = require('./params');
 
 const sharpStream = _ => sharp({ animated: !process.env.NO_ANIMATE, unlimited: true });
 
