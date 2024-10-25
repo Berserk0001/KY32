@@ -1,4 +1,5 @@
 "use strict";
+const params= require('./params');
 function redirect(req, res) {
   if (res.headersSent) return;
 
