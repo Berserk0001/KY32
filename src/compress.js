@@ -11,15 +11,17 @@ const sharpStream = _ => sharp({ animated: !process.env.NO_ANIMATE, unlimited: t
 
 function compress(req, res, input) {
   
-  const format = req.params.webp ? 'webp' : 'jpeg';
-  sharp(input)
-  .metadata()
-  .then(meta => {
-    console.log('Image height:', meta.height); // Output the height of the input image
-  })
-  .catch(err => {
-    console.error('Error retrieving image metadata:', err.message);
-  });
+   let format = req.params.webp ? 'webp' : 'jpeg';
+  const imageProcessing = worker(input)
+
+  const metadata = await imageProcessing.metadata();
+
+  if (format == 'webp'){
+    // maximum webp size was 16383 x 16383. using jpeg if more than 16383
+    if (metadata.height > 16383 || metadata.width > 16383 ){
+      format = 'jpeg'
+    }
+  }
   /*
    * Determine the uncompressed image size when there's no content-length header.
    */
