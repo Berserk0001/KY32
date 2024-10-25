@@ -7,52 +7,45 @@
 const sharp = require('sharp');
 const redirect = require('./redirect');
 
+const sharpStream = _ => sharp({ animated: !process.env.NO_ANIMATE, unlimited: true });
+
 function compress(req, res, input) {
-  const initialFormat = req.params.webp ? 'webp' : 'jpeg';
+  let format = req.params.webp ? 'webp' : 'jpeg';
 
-  // Create a sharp instance for metadata extraction
-  const sharpInstance = sharp(input.body);
+  // Get metadata to check dimensions
+  sharp(input.body).metadata().then(metadata => {
+    // Check dimensions for WebP format
+    if (format === 'webp' && (metadata.height > 16383 || metadata.width > 16383)) {
+      format = 'jpeg';
+    }
 
-  sharpInstance
-    .metadata()
-    .then(metadata => {
-      let format = initialFormat;
-
-      // Maximum WebP size is 16383 x 16383; use JPEG if dimensions exceed this limit.
-      if (initialFormat === 'webp' && (metadata.height > 16383 || metadata.width > 16383)) {
-        format = 'jpeg';
-      }
-
-      // Compress the image using the selected format and parameters
-      return sharp(input.body)
-        .grayscale(req.params.grayscale)
-        .toFormat(format, {
-          quality: req.params.quality,
-          progressive: true,
-          optimizeScans: true,
-        })
-        .toBuffer()
-        .then(output => {
-          return { output, info: { size: output.length } }; // Create a mock info object
-        });
-    })
-    .then(({ output, info }) => {
-      _sendResponse(null, output, info, format, req, res);
-    })
-    .catch(err => {
-      console.error("Error processing image:", err);
-      redirect(req, res);
-    });
+    // Pipe input to sharp and process the image
+    input.body.pipe(sharpStream()
+      .grayscale(req.params.grayscale)
+      .toFormat(format, {
+        quality: req.params.quality,
+        progressive: true,
+        optimizeScans: true
+      })
+      .toBuffer((err, output, info) => _sendResponse(err, output, info, format, req, res)));
+  }).catch(err => {
+    console.error('Error processing image metadata:', err);
+    redirect(req, res);
+  });
 }
 
 function _sendResponse(err, output, info, format, req, res) {
-  if (err || !info) return redirect(req, res);
+  if (err || !info) {
+    console.error('Error during image compression:', err);
+    return redirect(req, res);
+  }
 
+  // Set response headers
   res.setHeader('content-type', 'image/' + format);
   res.setHeader('content-length', info.size);
   res.setHeader('x-original-size', req.params.originSize);
   res.setHeader('x-bytes-saved', req.params.originSize - info.size);
-  res.status(200).write(output).end();
+  res.status(200).send(output);
 }
 
 module.exports = compress;
